@@ -5,34 +5,35 @@ import tw from 'tailwind-rn'
 import useAuth from '../hooks/useAuth'
 import { AntDesign, Entypo, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import Swiper from "react-native-deck-swiper"
-import { query, where, doc, onSnapshot, collection, setDoc, getDocs } from "firebase/firestore";
+import { query, where, doc, DocumentSnapshot, onSnapshot, collection, setDoc, getDoc, getDocs } from "firebase/firestore";
 import { db } from '../firebase'
+import generateId from '../lib/generateId'
 
-// const DUMMYDATA = [
-//     {
-//         firstName: "raj",
-//         lastName: "chakraborty",
-//         occupation: "student",
-//         photoURL: "https://picjumbo.com/wp-content/uploads/alone-with-his-thoughts-1080x720.jpg",
-//         age: '25',
-//         id: 123
-//     },
-//     {
-//         firstName: "raj",
-//         lastName: "chakraborty",
-//         occupation: "student",
-//         photoURL: "https://api.time.com/wp-content/uploads/2019/08/better-smartphone-photos.jpg",
-//         age: '25',
-//         id: 456
-//     },
-//     {
-//         firstName: "raj",
-//         lastName: "chakraborty",
-//         occupation: "student",
-//         photoURL: "https://picjumbo.com/wp-content/uploads/alone-with-his-thoughts-1080x720.jpg",
-//         age: '25',
-//         id: 789
-//     }
+const DUMMYDATA = [
+    {
+        firstName: "raj",
+        lastName: "chakraborty",
+        occupation: "student",
+        photoURL: "https://picjumbo.com/wp-content/uploads/alone-with-his-thoughts-1080x720.jpg",
+        age: '25',
+        id: 123
+    },
+    {
+        firstName: "raj",
+        lastName: "chakraborty",
+        occupation: "student",
+        photoURL: "https://api.time.com/wp-content/uploads/2019/08/better-smartphone-photos.jpg",
+        age: '25',
+        id: 456
+    },
+    {
+        firstName: "raj",
+        lastName: "chakraborty",
+        occupation: "student",
+        photoURL: "https://picjumbo.com/wp-content/uploads/alone-with-his-thoughts-1080x720.jpg",
+        age: '25',
+        id: 789
+    }
 ]
 
 const HomeScreen = () => {
@@ -87,7 +88,7 @@ const HomeScreen = () => {
         // inside a useEffect you need to wrap it with an async function
         fetchCards()
         return unsub
-    }, [])
+    }, [db])
    
 
     const swipeLeft = async(cardIndex) => {
@@ -103,11 +104,43 @@ const HomeScreen = () => {
         if(!profiles[cardIndex]) return
 
         const userSwiped = profiles[cardIndex]
-        console.log(`you swiped on ${userSwiped.displayName} (${userSwiped.job})`)
+        const loggedInProfile = await (await getDoc(doc(db, 'users', user.uid)))
+        .data()
 
-        setDoc(doc(db, 'users' , user.uid, 'swipes', userSwiped.id), userSwiped)
+            // check if the user swipes on you, (it is usually done in server)
+
+            getDoc(doc(db, 'users', userSwiped.id, 'swipes', user.uid)).then( 
+            (DocumentSnapshot) => {
+                if (DocumentSnapshot.exists()){
+                    //user swipes on you before you swipes on her
+                    //create a Match
+                    console.log(`you matched with ${userSwiped.displayName}`)
+
+
+            setDoc(doc(db, 'users' , user.uid, 'swipes', userSwiped.id), userSwiped)
+                    
+                    //create a match
+            setDoc(doc(db, "matches", generateId(user.uid, userSwiped.id)), {
+                    users: {
+                        [user.uid]: loggedInProfile,
+                        [userSwiped.id]: userSwiped,
+                    },
+                    usersMatched: [user.uid, userSwiped.id],
+                    Timestamp: serverTimestamp()
+                })
+
+                navigation.navigate("Match", {
+                loggedInProfile, userSwiped,
+                })
+            } else {
+               console.log(`you swiped on ${userSwiped.displayName} (${userSwiped.job})`)
+
+                setDoc(doc(db, 'users' , user.uid, 'swipes', userSwiped.id), userSwiped)
        
-    }
+            } 
+        }
+    )
+}
 
 
 
