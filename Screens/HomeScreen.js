@@ -5,9 +5,9 @@ import tw from 'tailwind-rn'
 import useAuth from '../hooks/useAuth'
 import { AntDesign, Entypo, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import Swiper from "react-native-deck-swiper"
-import { query, where, doc, DocumentSnapshot, onSnapshot, collection, setDoc, getDoc, getDocs } from "firebase/firestore";
+import { query, where, doc, onSnapshot, collection, setDoc, getDocs, getDoc, serverTimestamp } from "firebase/firestore";
 import { db } from '../firebase'
-import generateId from '../lib/generateId'
+import generateId from "../lib/generateId"
 
 const DUMMYDATA = [
     {
@@ -70,7 +70,7 @@ const HomeScreen = () => {
 
             const passedUser = passes.length > 0 ? passes: ['text']
             const swipedUser = swipes.length > 0 ? swipes: ['text']
-            console.log([...passedUser, ...swipedUser])
+            // console.log([...passedUser, ...swipedUser])
 
             unsub = onSnapshot(query(collection(db, 'users'),
              where("id", "not-in", [...passedUser, ...swipedUser])), (snapshot) => {
@@ -109,7 +109,7 @@ const HomeScreen = () => {
 
             // check if the user swipes on you, (it is usually done in server)
 
-            getDoc(doc(db, 'users', userSwiped.id, 'swipes', user.uid)).then( 
+        getDoc(doc(db, 'users', userSwiped.id, 'swipes', user.uid)).then( 
             (DocumentSnapshot) => {
                 if (DocumentSnapshot.exists()){
                     //user swipes on you before you swipes on her
@@ -129,7 +129,7 @@ const HomeScreen = () => {
                     Timestamp: serverTimestamp()
                 })
 
-                navigation.navigate("Match", {
+                navigation.navigate('Match', {
                 loggedInProfile, userSwiped,
                 })
             } else {
