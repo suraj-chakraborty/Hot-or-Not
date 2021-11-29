@@ -3,11 +3,9 @@ import React, { useEffect, useState } from "react";
 import {
   SafeAreaView,
   View,
-  Text,
   TextInput,
   Button,
   KeyboardAvoidingView,
-  TouchableOpacity,
   Keyboard,
   TouchableWithoutFeedback,
   FlatList,

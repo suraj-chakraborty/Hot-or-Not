@@ -4,15 +4,28 @@ import { View, Text, TouchableOpacity, Image } from "react-native";
 import useAuth from "../hooks/useAuth";
 import getMatchedUserInfo from "../lib/getMatchedUserInfo";
 import tw from "tailwind-rn";
+import { db } from "../firebase";
+import { collection, onSnapshot, orderBy, query } from "@firebase/firestore";
 
 const ChatRow = ({ matchDetails }) => {
   const navigation = useNavigation();
   const { user } = useAuth();
+  const [lastMessage, setLastMessage] = useState("");
   const [matchUserInfo, setMatchUserInfo] = useState(null);
 
   useEffect(() => {
     setMatchUserInfo(getMatchedUserInfo(matchDetails.users, user.uid));
   }, [matchDetails, user]);
+
+  useEffect(() => {
+    onSnapshot(
+      query(
+        collection(db, "matches", matchDetails.id, "messages"),
+        orderBy("timestamp", "desc")
+      ),
+      (snapshot) => setLastMessage(snapshot.docs[0]?.data()?.message)
+    );
+  }, [matchDetails, db]);
 
   return (
     <TouchableOpacity
@@ -31,7 +44,7 @@ const ChatRow = ({ matchDetails }) => {
       />
       <View>
         <Text>{matchUserInfo?.displayName}</Text>
-        <Text>{"send a message"}</Text>
+        <Text>{lastMessage || "send a message"}</Text>
       </View>
     </TouchableOpacity>
   );

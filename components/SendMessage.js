@@ -5,10 +5,14 @@ import tw from "tailwind-rn";
 const SendMessage = ({ message }) => {
   return (
     <View
-      style={
-        ([tw("bg-purple-600 rounded-lg rounded-tr-none px-5 py-3 mx-3 my-2")],
-        { alignSelf: "flex-start", marginLeft: "auto" })
-      }
+      style={[
+        tw(" rounded-lg rounded-tr-none px-5 py-3 mx-3 my-2"),
+        {
+          alignSelf: "flex-start",
+          marginLeft: "auto",
+          backgroundColor: "#358597",
+        },
+      ]}
     >
       <Text style={tw("text-white")}>{message.message}</Text>
     </View>
