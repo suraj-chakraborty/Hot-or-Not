@@ -26,7 +26,7 @@ const LoginScreen = () => {
       <ImageBackground
         resizeMode="cover"
         style={tw("flex-1")}
-        source={require("../image/bg2.jpg")}
+        source={require("../image/logo3.jpg")}
       >
         <TouchableOpacity
           style={[
@@ -37,7 +37,7 @@ const LoginScreen = () => {
         >
           <Text style={tw("font-semibold text-center p-2")}>
             <Image
-              style={tw("h-8 w-8 p-2 left-20")}
+              style={tw("h-8 w-8")}
               source={require("../image/google-logo-9827.png")}
             />
             Sign in with google
